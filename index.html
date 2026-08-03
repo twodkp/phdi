@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhD Semester 1</title>
+    <style>
+        :root {
+            --bg-base: #080b11;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-blur: blur(24px) saturate(180%);
+
+            --theme-algebra: #ff9f43;
+            --theme-graph: #a855f7;
+            --theme-topology: #00d2d3;
+            --theme-readings: #34d399;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1.5rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Ambient background glow */
+        .ambient-light {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.3;
+        }
+
+        .blob-1 { width: 450px; height: 450px; background: var(--theme-algebra); top: -10%; left: -5%; }
+        .blob-2 { width: 500px; height: 500px; background: var(--theme-graph); bottom: -10%; right: -5%; }
+        .blob-3 { width: 400px; height: 400px; background: var(--theme-topology); top: 35%; left: 35%; }
+
+        .container {
+            max-width: 960px;
+            width: 100%;
+            z-index: 1;
+        }
+
+        /* Header */
+        header {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem 2.5rem;
+            margin-bottom: 2.5rem;
+            text-align: center;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        header h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, #ffffff 40%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Section Title */
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            letter-spacing: -0.01em;
+            color: var(--text-secondary);
+            padding-left: 0.25rem;
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: var(--card-accent);
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4), 0 0 24px var(--card-glow);
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--glass-border);
+            margin-bottom: 1.5rem;
+            color: var(--card-accent);
+        }
+
+        .card-icon svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .card h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+        }
+
+        /* Course Themes */
+        .card-algebra {
+            --card-accent: var(--theme-algebra);
+            --card-glow: rgba(255, 159, 67, 0.25);
+        }
+
+        .card-graph {
+            --card-accent: var(--theme-graph);
+            --card-glow: rgba(168, 85, 247, 0.25);
+        }
+
+        .card-topology {
+            --card-accent: var(--theme-topology);
+            --card-glow: rgba(0, 210, 211, 0.25);
+        }
+
+        .card-readings {
+            --card-accent: var(--theme-readings);
+            --card-glow: rgba(52, 211, 153, 0.25);
+        }
+
+        .schedule-section {
+            margin-top: 3rem;
+        }
+
+        .schedule-container {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+            overflow-x: auto;
+        }
+
+        .schedule-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0.5rem;
+            min-width: 720px;
+        }
+
+        .schedule-table th {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            padding: 0.75rem 0.5rem;
+            text-align: center;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .schedule-table th:first-child {
+            text-align: left;
+            padding-left: 1rem;
+        }
+
+        .schedule-table td {
+            text-align: center;
+            vertical-align: middle;
+            padding: 0.35rem;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            height: 56px;
+        }
+
+        .day-cell {
+            font-weight: 600;
+            color: var(--text-primary);
+            text-align: left !important;
+            padding-left: 1rem !important;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            width: 80px;
+        }
+
+        .empty-cell {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px dashed rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.15);
+            font-size: 1.1rem;
+        }
+
+        .lunch-cell {
+            background: rgba(255, 255, 255, 0.025);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .course-tag {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
+            border-radius: 10px;
+            padding: 0.5rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            box-shadow: inset 0 0 12px rgba(255, 255, 255, 0.03);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .course-tag:hover {
+            transform: translateY(-2px);
+        }
+
+        .tag-algebra {
+            background: rgba(255, 159, 67, 0.12);
+            color: #ffb067;
+            border: 1px solid rgba(255, 159, 67, 0.35);
+        }
+
+        .tag-graph {
+            background: rgba(168, 85, 247, 0.12);
+            color: #c084fc;
+            border: 1px solid rgba(168, 85, 247, 0.35);
+        }
+
+        .tag-topology {
+            background: rgba(0, 210, 211, 0.12);
+            color: #22d3ee;
+            border: 1px solid rgba(0, 210, 211, 0.35);
+        }
+
+        .today-row .day-cell {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.1);
+        }
+
+        .today-badge {
+            display: inline-block;
+            margin-left: 0.4rem;
+            padding: 0.15rem 0.35rem;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.18);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        @media (max-width: 640px) {
+            body { padding: 1.5rem 1rem; }
+            header { padding: 1.5rem; }
+            header h1 { font-size: 1.75rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-light">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <div class="container">
+        
+        <header>
+            <h1>Welcome to PhD Semester 1</h1>
+        </header>
+
+        <main>
+            <h2 class="section-title">Coursework I</h2>
+
+            <div class="cards-grid">
+
+                <!-- Algebra I (Orangish Yellow) -->
+                <a href="alg.html" class="card card-algebra">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="4" y="4" width="16" height="16" rx="2" />
+                            <path d="M9 9h6" />
+                            <path d="M12 9v6" />
+                            <path d="M9 15h6" />
+                        </svg>
+                    </div>
+                    <h2>Algebra I</h2>
+                </a>
+
+                <!-- Graph Theory (Purple) -->
+                <a href="graph.html" class="card card-graph">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="18" cy="5" r="3" />
+                            <circle cx="6" cy="12" r="3" />
+                            <circle cx="18" cy="19" r="3" />
+                            <line x1="8.5" y1="10.5" x2="15.5" y2="6.5" />
+                            <line x1="8.5" y1="13.5" x2="15.5" y2="17.5" />
+                            <line x1="18" y1="8" x2="18" y2="16" />
+                        </svg>
+                    </div>
+                    <h2>Graph Theory</h2>
+                </a>
+
+                <!-- Topology I (Aqua) -->
+                <a href="topo.html" class="card card-topology">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-3.5-6.5a3.5 3.5 0 0 1 7 0" />
+                            <path d="M12 22a7 7 0 0 1-7-7c0-2 1-3.9 3-5.5s3.5-4 3.5-6.5a3.5 3.5 0 0 0-7 0" />
+                        </svg>
+                    </div>
+                    <h2>Topology I</h2>
+                </a>
+
+                <!-- Readings (Emerald Green) -->
+                <a href="books.html" class="card card-readings">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                        </svg>
+                    </div>
+                    <h2>Readings</h2>
+                </a>
+
+            </div>
+
+            <section class="schedule-section">
+                <h2 class="section-title">Schedule</h2>
+                
+                <div class="schedule-container">
+                    <table class="schedule-table" style="min-width: 720px;">
+                        <thead>
+                            <tr>
+                                <th>Day</th>
+                                <th>10:00 - 10:55</th>
+                                <th>11:00 - 11:55</th>
+                                <th>12:00 - 12:55</th>
+                                <th>13:00 - 13:55</th>
+                                <th>14:00 - 14:55</th>
+                                <th>17:00 - 17:55</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Monday (data-day="1") -->
+                            <tr data-day="1">
+                                <td class="day-cell">Mon</td>
+                                <td colspan="3" class="empty-cell">&bull;</td>
+                                <td rowspan="5" class="lunch-cell">Lunch Break</td>
+                                <td class="empty-cell">&bull;</td>
+                                <td><div class="course-tag tag-topology">Topology I</div></td>
+                            </tr>
+                            <!-- Tuesday (data-day="2") -->
+                            <tr data-day="2">
+                                <td class="day-cell">Tue</td>
+                                <td><div class="course-tag tag-graph">Graph Theory</div></td>
+                                <td colspan="2" class="empty-cell">&bull;</td>
+                                <td><div class="course-tag tag-topology">Topology I</div></td>
+                                <td class="empty-cell">&bull;</td>
+                            </tr>
+                            <!-- Wednesday (data-day="3") -->
+                            <tr data-day="3">
+                                <td class="day-cell">Wed</td>
+                                <td><div class="course-tag tag-graph">Graph Theory</div></td>
+                                <td colspan="2" class="empty-cell">&bull;</td>
+                                <td><div class="course-tag tag-algebra">Algebra I</div></td>
+                                <td class="empty-cell">&bull;</td>
+                            </tr>
+                            <!-- Thursday (data-day="4") -->
+                            <tr data-day="4">
+                                <td class="day-cell">Thu</td>
+                                <td colspan="2" class="empty-cell">&bull;</td>
+                                <td><div class="course-tag tag-algebra">Algebra I</div></td>
+                                <td class="empty-cell">&bull;</td>
+                                <td><div class="course-tag tag-topology">Topology I</div></td>
+                            </tr>
+                            <!-- Friday (data-day="5") -->
+                            <tr data-day="5">
+                                <td class="day-cell">Fri</td>
+                                <td class="empty-cell">&bull;</td>
+                                <td><div class="course-tag tag-graph">Graph Theory</div></td>
+                                <td><div class="course-tag tag-algebra">Algebra I</div></td>
+                                <td colspan="2" class="empty-cell">&bull;</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tbody = document.querySelector('.schedule-table tbody');
+            if (!tbody) return;
+
+            const rows = Array.from(tbody.querySelectorAll('tr[data-day]'));
+            if (rows.length === 0) return;
+
+            // Get current day of week (0 = Sun, 1 = Mon, ..., 6 = Sat)
+            const today = new Date().getDay();
+            
+            // If weekday (Mon-Fri), use today's day; default to Mon (1) on weekends
+            const startDay = (today >= 1 && today <= 5) ? today : 1;
+
+            // Sort rows cyclically starting from startDay
+            rows.sort((a, b) => {
+                const dayA = parseInt(a.getAttribute('data-day'), 10);
+                const dayB = parseInt(b.getAttribute('data-day'), 10);
+
+                const offsetA = (dayA - startDay + 5) % 5;
+                const offsetB = (dayB - startDay + 5) % 5;
+
+                return offsetA - offsetB;
+            });
+
+            // Re-append rows in sorted order
+            rows.forEach(row => tbody.appendChild(row));
+
+            // Manage single merged lunch cell for the top row
+            let lunchCell = tbody.querySelector('.lunch-cell');
+            if (lunchCell) {
+                lunchCell.remove();
+            } else {
+                lunchCell = document.createElement('td');
+                lunchCell.className = 'lunch-cell';
+                lunchCell.textContent = 'Lunch Break';
+            }
+            lunchCell.setAttribute('rowspan', '5');
+
+            // Find insertion point in the first row after 3 morning slot columns
+            const firstRow = rows[0];
+            let colCount = 0;
+            let insertBeforeNode = null;
+            const cells = Array.from(firstRow.children);
+
+            for (let i = 1; i < cells.length; i++) {
+                const span = parseInt(cells[i].getAttribute('colspan') || '1', 10);
+                colCount += span;
+                if (colCount >= 3) {
+                    insertBeforeNode = cells[i + 1] || null;
+                    break;
+                }
+            }
+
+            if (insertBeforeNode) {
+                firstRow.insertBefore(lunchCell, insertBeforeNode);
+            } else {
+                firstRow.appendChild(lunchCell);
+            }
+
+            // Highlight current day if it falls on a weekday and replace day label with 'TODAY'
+            rows.forEach(row => {
+                if (parseInt(row.getAttribute('data-day'), 10) === today) {
+                    row.classList.add('today-row');
+                    const dayCell = row.querySelector('.day-cell');
+                    if (dayCell) {
+                        dayCell.textContent = 'TODAY';
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

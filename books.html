@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resource Vault | PhD Coursework</title>
+    <style>
+        :root {
+            --bg-base: #080b11;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-bg-hover: rgba(255, 255, 255, 0.06);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-border-hover: rgba(52, 211, 153, 0.35);
+            --glass-blur: blur(24px) saturate(180%);
+
+            /* Emerald #34d399 Theme Variables */
+            --theme-emerald: #34d399;
+            --theme-emerald-light: #6ee7b7;
+            --theme-emerald-dark: #059669;
+            --theme-emerald-glow: rgba(52, 211, 153, 0.22);
+            --theme-emerald-subtle: rgba(52, 211, 153, 0.12);
+            --theme-emerald-border: rgba(52, 211, 153, 0.3);
+
+            --theme-blue-subtle: rgba(56, 189, 248, 0.12);
+            --theme-blue-border: rgba(56, 189, 248, 0.3);
+            --theme-blue-light: #7dd3fc;
+
+            --danger: #ef4444;
+            --danger-subtle: rgba(239, 68, 68, 0.12);
+            --danger-border: rgba(239, 68, 68, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 2.5rem 1.5rem;
+            position: relative;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        .ambient-light {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.32;
+        }
+
+        .blob-1 { width: 550px; height: 550px; background: var(--theme-emerald); top: -12%; left: -10%; }
+        .blob-2 { width: 500px; height: 500px; background: #0284c7; bottom: -10%; right: -5%; opacity: 0.2; }
+        .blob-3 { width: 380px; height: 380px; background: #10b981; top: 40%; left: 30%; opacity: 0.15; }
+
+        .container {
+            max-width: 980px;
+            width: 100%;
+            z-index: 1;
+        }
+
+        .nav-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 0.6rem 1.2rem;
+            border-radius: 12px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            transition: all 0.25s ease;
+            cursor: pointer;
+        }
+
+        .back-btn:hover {
+            color: var(--text-primary);
+            border-color: var(--theme-emerald-border);
+            background: var(--glass-bg-hover);
+            transform: translateX(-3px);
+        }
+
+        .back-btn svg {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.35rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            background: var(--theme-emerald-subtle);
+            color: var(--theme-emerald-light);
+            border: 1px solid var(--theme-emerald-border);
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, var(--theme-emerald) 0%, var(--theme-emerald-dark) 100%);
+            color: #041d13;
+            font-weight: 700;
+            font-size: 0.9rem;
+            padding: 0.7rem 1.4rem;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 20px var(--theme-emerald-glow);
+            transition: all 0.25s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(52, 211, 153, 0.4);
+            filter: brightness(1.08);
+        }
+
+        .btn-primary svg {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            stroke-width: 2.5;
+        }
+
+        header.hero-card {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2.25rem 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header.hero-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--theme-emerald) 0%, transparent 100%);
+        }
+
+        .hero-title-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .hero-title-group h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            color: var(--text-primary);
+        }
+
+        .hero-subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            font-weight: 400;
+        }
+
+        .controls-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.75rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 260px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 0.75rem 1rem 0.75rem 2.6rem;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            outline: none;
+            backdrop-filter: var(--glass-blur);
+            transition: all 0.2s ease;
+        }
+
+        .search-box input:focus {
+            border-color: var(--theme-emerald);
+            box-shadow: 0 0 14px var(--theme-emerald-glow);
+        }
+
+        .search-box svg {
+            position: absolute;
+            left: 0.9rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            stroke: var(--text-secondary);
+            pointer-events: none;
+        }
+
+        .action-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            padding: 0.75rem 1.25rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            backdrop-filter: var(--glass-blur);
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .action-btn:hover {
+            color: var(--text-primary);
+            border-color: var(--theme-emerald-border);
+            background: var(--glass-bg-hover);
+        }
+
+        .action-btn.danger-hover:hover {
+            border-color: var(--danger-border);
+            color: #fca5a5;
+            background: var(--danger-subtle);
+        }
+
+        .sections-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .glass-section-card {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: 22px;
+            padding: 1.75rem;
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.25);
+            transition: border-color 0.25s ease;
+            position: relative;
+        }
+
+        .glass-section-card:hover {
+            border-color: rgba(52, 211, 153, 0.2);
+        }
+
+        .section-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .section-title-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex: 1;
+            min-width: 220px;
+        }
+
+        .section-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--theme-emerald);
+            box-shadow: 0 0 12px var(--theme-emerald);
+            flex-shrink: 0;
+        }
+
+        .section-title-input {
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-primary);
+            font-size: 1.3rem;
+            font-weight: 700;
+            padding: 0.2rem 0.5rem;
+            border-radius: 8px;
+            outline: none;
+            width: 100%;
+            transition: all 0.2s ease;
+        }
+
+        .section-title-input:hover {
+            border-color: var(--glass-border);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .section-title-input:focus {
+            border-color: var(--theme-emerald-border);
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .section-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .add-source-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .btn-add-source {
+            background: var(--theme-emerald-subtle);
+            border: 1px solid var(--theme-emerald-border);
+            color: var(--theme-emerald-light);
+            padding: 0.65rem 1.1rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-add-source:hover {
+            background: rgba(52, 211, 153, 0.2);
+            border-color: var(--theme-emerald);
+            transform: translateY(-1px);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            right: 0;
+            top: calc(100% + 6px);
+            background: #0f172a;
+            border: 1px solid var(--glass-border-hover);
+            border-radius: 14px;
+            padding: 0.5rem;
+            min-width: 190px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+            backdrop-filter: var(--glass-blur);
+            z-index: 20;
+            display: none;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+            animation: fadeIn 0.15s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dropdown-item {
+            width: 100%;
+            text-align: left;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            padding: 0.6rem 0.8rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            transition: background 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--theme-emerald-light);
+        }
+
+        .dropdown-item svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+        }
+
+        .sources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 1.1rem;
+        }
+
+        .source-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 1rem;
+            transition: all 0.25s ease;
+            position: relative;
+        }
+
+        .source-card:hover {
+            border-color: var(--theme-emerald-border);
+            background: rgba(255, 255, 255, 0.038);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        .source-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 0.5rem;
+        }
+
+        .source-type-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 0.25rem 0.6rem;
+            border-radius: 8px;
+        }
+
+        .tag-text {
+            background: var(--theme-emerald-subtle);
+            color: var(--theme-emerald-light);
+            border: 1px solid var(--theme-emerald-border);
+        }
+
+        .tag-file {
+            background: var(--theme-blue-subtle);
+            color: var(--theme-blue-light);
+            border: 1px solid var(--theme-blue-border);
+        }
+
+        .btn-icon-del {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0.2rem;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-icon-del:hover {
+            color: var(--danger);
+            background: rgba(239, 68, 68, 0.15);
+        }
+
+        .text-source-body {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .text-title-input {
+            background: transparent;
+            border: none;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.15);
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 0.2rem 0;
+            outline: none;
+        }
+
+        .text-title-input:focus {
+            border-bottom-color: var(--theme-emerald);
+        }
+
+        .text-area-custom {
+            width: 100%;
+            min-height: 100px;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 0.75rem;
+            color: var(--text-secondary);
+            font-family: inherit;
+            font-size: 0.88rem;
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .text-area-custom:focus {
+            border-color: var(--theme-emerald-border);
+            color: var(--text-primary);
+        }
+
+        .save-indicator {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            justify-content: flex-end;
+        }
+
+        .file-source-body {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .file-title-display {
+            font-size: 0.98rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            word-break: break-word;
+        }
+
+        .file-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+        }
+
+        .btn-copy-path {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-copy-path:hover {
+            background: var(--theme-emerald-subtle);
+            border-color: var(--theme-emerald-border);
+            color: var(--theme-emerald-light);
+        }
+
+        .btn-copy-path.copied {
+            background: rgba(52, 211, 153, 0.25);
+            color: var(--theme-emerald-light);
+            border-color: var(--theme-emerald);
+        }
+
+        .ext-badge {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .btn-open-file {
+            background: rgba(52, 211, 153, 0.15);
+            border: 1px solid var(--theme-emerald-border);
+            color: var(--theme-emerald-light);
+            padding: 0.45rem 0.85rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .btn-open-file:hover {
+            background: var(--theme-emerald);
+            color: #041d13;
+            box-shadow: 0 0 12px var(--theme-emerald-glow);
+            transform: translateY(-1px);
+        }
+
+        .toast-notification {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #0d131f;
+            border: 1px solid var(--theme-emerald-border);
+            color: var(--text-primary);
+            padding: 0.85rem 1.25rem;
+            border-radius: 12px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+            backdrop-filter: var(--glass-blur);
+            font-size: 0.85rem;
+            z-index: 200;
+            display: none;
+            max-width: 380px;
+            animation: slideUp 0.25s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .empty-section-msg {
+            text-align: center;
+            padding: 2.5rem 1rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            border: 1px dashed rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(4, 8, 15, 0.75);
+            backdrop-filter: blur(12px);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-card {
+            background: #0d131f;
+            border: 1px solid var(--glass-border-hover);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 520px;
+            padding: 2rem;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
+            transform: scale(0.95);
+            transition: transform 0.25s ease;
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.25rem;
+        }
+
+        .modal-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .form-label {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .form-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-input:focus {
+            border-color: var(--theme-emerald);
+            box-shadow: 0 0 12px var(--theme-emerald-glow);
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        @media (max-width: 640px) {
+            body { padding: 1.25rem 1rem; }
+            header.hero-card { padding: 1.5rem; }
+            .hero-title-group h1 { font-size: 1.8rem; }
+            .glass-section-card { padding: 1.25rem; }
+            .sources-grid { grid-template-columns: 1fr; }
+            .nav-header { flex-direction: column; align-items: stretch; }
+            .btn-primary { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-light">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <div id="toastNotification" class="toast-notification"></div>
+
+    <div class="modal-overlay" id="infoModal">
+        <div class="modal-card" style="max-width: 580px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Import JSON Format Example</h3>
+                <button class="btn-icon-del" onclick="closeModal('infoModal')">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 1rem;">
+                The import file must be a valid JSON file formatted as an array of section objects containing text notes or local file paths:
+            </p>
+            <div style="position: relative;">
+                <pre id="jsonExampleCode" style="background: rgba(0, 0, 0, 0.45); border: 1px solid var(--glass-border); border-radius: 12px; padding: 1rem; color: #a7f3d0; font-family: monospace; font-size: 0.82rem; overflow-x: auto; max-height: 260px; line-height: 1.5;">[
+  {
+    "id": "sec-1700000000000",
+    "title": "Coursework Documents",
+    "sources": [
+      {
+        "id": "src-1700000000001",
+        "type": "file",
+        "title": "Document Title",
+        "path": "C:\\Path\\To\\Your\\File.pdf",
+        "createdAt": "2026-08-03T10:00:00.000Z"
+      },
+      {
+        "id": "src-1700000000002",
+        "type": "text",
+        "title": "Important Reminders",
+        "content": "Submit research proposal before Friday.",
+        "createdAt": "2026-08-03T10:05:00.000Z"
+      }
+    ]
+  }
+]</pre>
+            </div>
+            <div class="modal-actions" style="margin-top: 1.25rem;">
+                <button class="btn-copy-path" onclick="copySampleJson(this)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    Copy Sample JSON
+                </button>
+                <button type="button" class="action-btn" onclick="closeModal('infoModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="fileModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 class="modal-title">Add File Location</h3>
+                <button class="btn-icon-del" onclick="closeModal('fileModal')">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <form onsubmit="handleFileFormSubmit(event)">
+                <input type="hidden" id="modalSectionId">
+                <div class="form-group">
+                    <label class="form-label">Title</label>
+                    <input type="text" id="fileTitleInput" class="form-input" placeholder="File title..." required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">File Path Location</label>
+                    <input type="text" id="filePathInput" class="form-input" placeholder='e.g. "C:\Path\To\Your\File.pdf"' required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="action-btn" onclick="closeModal('fileModal')">Cancel</button>
+                    <button type="submit" class="btn-primary" style="padding: 0.6rem 1.2rem;">Add File Source</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-card" style="max-width: 420px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Confirm Deletion</h3>
+                <button class="btn-icon-del" onclick="closeModal('confirmModal')">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <form onsubmit="handleConfirmDelete(event)">
+                <p style="color: var(--text-secondary); font-size: 0.92rem; margin-bottom: 1.2rem; line-height: 1.5;">
+                    To delete this <span id="deleteItemType" style="color: var(--text-primary); font-weight: 600;">item</span>, enter the verification code: 
+                    <strong id="deleteSecurityCode" style="color: var(--theme-emerald-light); font-size: 1.2rem; letter-spacing: 2px; margin-left: 0.4rem; font-family: monospace;">000</strong>
+                </p>
+                <div class="form-group">
+                    <input type="text" id="confirmCodeInput" class="form-input" placeholder="Enter 3-digit code" maxlength="3" autocomplete="off" required>
+                    <div id="confirmCodeError" style="color: var(--danger); font-size: 0.8rem; margin-top: 0.4rem; display: none;">Incorrect code. Please try again.</div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="action-btn" onclick="closeModal('confirmModal')">Cancel</button>
+                    <button type="submit" class="btn-primary" style="background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); color: #ffffff; box-shadow: 0 4px 20px rgba(239, 68, 68, 0.35); padding: 0.6rem 1.2rem;">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="container">
+        
+        <nav class="nav-header">
+            <div class="nav-left">
+                <a href="index.html" class="back-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    Dashboard
+                </a>
+                <span class="badge">Resource Vault</span>
+            </div>
+            <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+                <button class="action-btn" onclick="exportDataBackup()" title="Export JSON Backup">Export Backup</button>
+                <button class="action-btn" onclick="triggerImportBackup()" title="Import JSON Backup">Import Backup</button>
+                <button class="action-btn" onclick="openModal('infoModal')" title="View JSON Format Example">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    Format Info
+                </button>
+                <input type="file" id="importFileInput" style="display:none" accept=".json" onchange="importDataBackup(event)">
+                <button class="btn-primary" onclick="createNewSection()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    Add Section
+                </button>
+            </div>
+        </nav>
+
+        <div class="controls-bar">
+            <div class="search-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" id="globalSearch" placeholder="Search resources and sections..." oninput="filterVault()">
+            </div>
+        </div>
+
+        <!-- Sections Container -->
+        <div class="sections-wrapper" id="sectionsWrapper"></div>
+    </div>
+
+    <script>
+        // LocalStorage Key
+        const STORAGE_KEY = 'iiser_emerald_vault_data_v1';
+
+        // Default initial data structure (empty by default)
+        const defaultData = [];
+        let vaultData = [];
+
+        // Security Deletion Variables
+        let pendingDeleteAction = null;
+        let currentSecurityCode = '';
+
+        // Initialize App
+        window.addEventListener('DOMContentLoaded', () => {
+            loadVaultData();
+            renderVault();
+
+            // Close open dropdowns when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.add-source-dropdown')) {
+                    document.querySelectorAll('.dropdown-menu').forEach(menu => menu.classList.remove('show'));
+                }
+            });
+        });
+
+        // Load from Browser Local Storage
+        function loadVaultData() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try {
+                    vaultData = JSON.parse(saved);
+                } catch (e) {
+                    console.error('Failed to parse saved data', e);
+                    vaultData = defaultData;
+                }
+            } else {
+                vaultData = defaultData;
+                saveVaultData();
+            }
+        }
+
+        // Save State to Local Storage
+        function saveVaultData() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(vaultData));
+        }
+
+        function renderVault() {
+            const container = document.getElementById('sectionsWrapper');
+            if (!container) return;
+            
+            container.innerHTML = '';
+
+            if (vaultData.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-section-msg">
+                        <p style="color: var(--text-secondary);">No sections added yet. Click <strong>"Add Section"</strong> above to start.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            vaultData.forEach((section) => {
+                const sectionEl = document.createElement('section');
+                sectionEl.className = 'glass-section-card';
+                sectionEl.id = `section-card-${section.id}`;
+
+                sectionEl.innerHTML = `
+                    <div class="section-header-row">
+                        <div class="section-title-group">
+                            <span class="section-dot"></span>
+                            <input type="text" class="section-title-input" value="${escapeHtml(section.title)}" 
+                                   onchange="updateSectionTitle('${section.id}', this.value)" placeholder="Section Title...">
+                        </div>
+                        <div class="section-actions">
+                            <div class="add-source-dropdown">
+                                <button class="btn-add-source" onclick="toggleSourceMenu(event, '${section.id}')">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                    Add Source
+                                </button>
+                                <div class="dropdown-menu" id="dropdown-${section.id}">
+                                    <button class="dropdown-item" onclick="addTextNoteSource('${section.id}')">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                        Text Note
+                                    </button>
+                                    <button class="dropdown-item" onclick="openFileModal('${section.id}')">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
+                                        File Location
+                                    </button>
+                                </div>
+                            </div>
+
+                            <button class="action-btn danger-hover" onclick="requestDeletion('section', '${section.id}')" title="Delete Section">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="sources-grid" id="grid-${section.id}">
+                        ${renderSourcesGrid(section)}
+                    </div>
+                `;
+
+                container.appendChild(sectionEl);
+            });
+        }
+
+        function renderSourcesGrid(section) {
+            if (!section.sources || section.sources.length === 0) {
+                return `<div class="empty-section-msg" style="grid-column: 1 / -1; padding: 1.25rem;">No sources added yet. Use "Add Source" to insert notes or file paths.</div>`;
+            }
+
+            return section.sources.map(source => {
+                if (source.type === 'text') {
+                    return `
+                        <div class="source-card" id="source-${source.id}">
+                            <div class="source-header">
+                                <span class="source-type-tag tag-text">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg>
+                                    Text Note
+                                </span>
+                                <button class="btn-icon-del" onclick="requestDeletion('source', '${section.id}', '${source.id}')" title="Delete Note">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                </button>
+                            </div>
+
+                            <div class="text-source-body">
+                                <input type="text" class="text-title-input" value="${escapeHtml(source.title)}" 
+                                       onchange="updateSourceTitle('${section.id}', '${source.id}', this.value)" placeholder="Note Title...">
+                                <textarea class="text-area-custom" 
+                                          oninput="updateTextContent('${section.id}', '${source.id}', this.value)" 
+                                          placeholder="Type note here...">${escapeHtml(source.content || '')}</textarea>
+                            </div>
+
+                            <div class="save-indicator">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--theme-emerald)" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Saved
+                            </div>
+                        </div>
+                    `;
+                } else if (source.type === 'file') {
+                    const cleanPath = sanitizeFilePath(source.path);
+                    const fileUrl = formatFileUrl(cleanPath);
+                    const ext = getFileExtension(cleanPath);
+
+                    return `
+                        <div class="source-card" id="source-${source.id}">
+                            <div class="source-header">
+                                <span class="source-type-tag tag-file">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path></svg>
+                                    File Location
+                                </span>
+                                <span class="ext-badge">${ext ? ext : 'FILE'}</span>
+                                <button class="btn-icon-del" onclick="requestDeletion('source', '${section.id}', '${source.id}')" title="Delete File Source">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                </button>
+                            </div>
+
+                            <div class="file-source-body">
+                                <div class="file-title-display">${escapeHtml(source.title)}</div>
+                            </div>
+
+                            <div class="file-actions">
+                                <a href="${escapeHtml(fileUrl)}" target="_blank" rel="noopener noreferrer" class="btn-open-file" onclick="handleFileClick(event, '${escapeJsString(cleanPath)}')">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                                    Open File
+                                </a>
+                                <button class="btn-copy-path" onclick="copyToClipboard('${escapeJsString(cleanPath)}', this)">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                    Copy Path
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+            }).join('');
+        }
+
+        function createNewSection() {
+            const newSec = {
+                id: 'sec-' + Date.now(),
+                title: 'New Section',
+                sources: []
+            };
+            vaultData.unshift(newSec);
+            saveVaultData();
+            renderVault();
+            
+            document.getElementById(`section-card-${newSec.id}`)?.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function updateSectionTitle(sectionId, title) {
+            const sec = vaultData.find(s => s.id === sectionId);
+            if (sec) {
+                sec.title = title.trim() || 'Untitled Section';
+                saveVaultData();
+            }
+        }
+
+        function requestDeletion(type, sectionId, sourceId = null) {
+            currentSecurityCode = Math.floor(100 + Math.random() * 900).toString();
+            pendingDeleteAction = { type, sectionId, sourceId };
+            
+            document.getElementById('deleteItemType').innerText = type === 'section' ? 'section' : 'resource';
+            document.getElementById('deleteSecurityCode').innerText = currentSecurityCode;
+            document.getElementById('confirmCodeInput').value = '';
+            document.getElementById('confirmCodeError').style.display = 'none';
+            
+            document.getElementById('confirmModal').classList.add('active');
+            setTimeout(() => document.getElementById('confirmCodeInput').focus(), 100);
+        }
+
+        function handleConfirmDelete(e) {
+            if (e) e.preventDefault();
+            const inputVal = document.getElementById('confirmCodeInput').value.trim();
+
+            if (inputVal !== currentSecurityCode) {
+                document.getElementById('confirmCodeError').style.display = 'block';
+                return;
+            }
+
+            if (pendingDeleteAction) {
+                if (pendingDeleteAction.type === 'section') {
+                    vaultData = vaultData.filter(s => s.id !== pendingDeleteAction.sectionId);
+                } else if (pendingDeleteAction.type === 'source') {
+                    const sec = vaultData.find(s => s.id === pendingDeleteAction.sectionId);
+                    if (sec) {
+                        sec.sources = sec.sources.filter(s => s.id !== pendingDeleteAction.sourceId);
+                    }
+                }
+                saveVaultData();
+                renderVault();
+            }
+            closeModal('confirmModal');
+        }
+
+        function toggleSourceMenu(event, sectionId) {
+            event.stopPropagation();
+            const currentMenu = document.getElementById(`dropdown-${sectionId}`);
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                if (menu !== currentMenu) menu.classList.remove('show');
+            });
+            currentMenu.classList.toggle('show');
+        }
+
+        function addTextNoteSource(sectionId) {
+            const sec = vaultData.find(s => s.id === sectionId);
+            if (sec) {
+                const newSource = {
+                    id: 'src-' + Date.now(),
+                    type: 'text',
+                    title: 'Quick Note',
+                    content: '',
+                    createdAt: new Date().toISOString()
+                };
+                sec.sources.unshift(newSource);
+                saveVaultData();
+                renderVault();
+            }
+        }
+
+        function updateSourceTitle(sectionId, sourceId, title) {
+            const sec = vaultData.find(s => s.id === sectionId);
+            if (sec) {
+                const src = sec.sources.find(s => s.id === sourceId);
+                if (src) {
+                    src.title = title;
+                    saveVaultData();
+                }
+            }
+        }
+
+        function updateTextContent(sectionId, sourceId, content) {
+            const sec = vaultData.find(s => s.id === sectionId);
+            if (sec) {
+                const src = sec.sources.find(s => s.id === sourceId);
+                if (src) {
+                    src.content = content;
+                    saveVaultData();
+                }
+            }
+        }
+
+        function openFileModal(sectionId) {
+            document.getElementById('modalSectionId').value = sectionId;
+            document.getElementById('fileTitleInput').value = '';
+            document.getElementById('filePathInput').value = '';
+            document.getElementById('fileModal').classList.add('active');
+            
+            document.querySelectorAll('.dropdown-menu').forEach(menu => menu.classList.remove('show'));
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId)?.classList.add('active');
+        }
+
+        function copySampleJson(btnElement) {
+            const codeEl = document.getElementById('jsonExampleCode');
+            if (codeEl) {
+                copyToClipboard(codeEl.innerText, btnElement);
+            }
+        }
+
+        function handleFileFormSubmit(e) {
+            e.preventDefault();
+            const sectionId = document.getElementById('modalSectionId').value;
+            const title = document.getElementById('fileTitleInput').value.trim();
+            const path = document.getElementById('filePathInput').value.trim();
+
+            if (!title || !path) return;
+
+            const sec = vaultData.find(s => s.id === sectionId);
+            if (sec) {
+                const newSource = {
+                    id: 'src-' + Date.now(),
+                    type: 'file',
+                    title: title,
+                    path: path,
+                    createdAt: new Date().toISOString()
+                };
+                sec.sources.unshift(newSource);
+                saveVaultData();
+                renderVault();
+                closeModal('fileModal');
+            }
+        }
+
+        function copyToClipboard(text, btnElement) {
+            const tempInput = document.createElement('textarea');
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            
+            try {
+                document.execCommand('copy');
+                if (btnElement) {
+                    const originalText = btnElement.innerHTML;
+                    btnElement.innerHTML = `
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        Copied!
+                    `;
+                    btnElement.classList.add('copied');
+                    
+                    setTimeout(() => {
+                        btnElement.innerHTML = originalText;
+                        btnElement.classList.remove('copied');
+                    }, 2000);
+                }
+            } catch (err) {
+                console.error('Copy failed', err);
+            } finally {
+                document.body.removeChild(tempInput);
+            }
+        }
+
+        function formatFileUrl(pathStr) {
+            const clean = sanitizeFilePath(pathStr);
+            if (!clean) return '#';
+            if (clean.startsWith('http://') || clean.startsWith('https://') || clean.startsWith('file://')) {
+                return clean;
+            }
+            if (/^[a-zA-Z]:[\\/]/.test(clean)) {
+                const normalized = clean.replace(/\\/g, '/');
+                return `file:///${normalized}`;
+            }
+            if (clean.startsWith('/')) {
+                return `file://${clean}`;
+            }
+            return clean.replace(/\\/g, '/');
+        }
+
+        function handleFileClick(e, pathStr) {
+            const cleanPath = sanitizeFilePath(pathStr);
+            if (!cleanPath) return;
+
+            try {
+                if (window.location.protocol !== 'file:' && !cleanPath.startsWith('http')) {
+                    showToast('Opening file... If blocked by browser policy, path copied to clipboard.');
+                    copyToClipboard(cleanPath, null);
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toastNotification');
+            if (toast) {
+                toast.innerText = msg;
+                toast.style.display = 'block';
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                }, 3500);
+            }
+        }
+
+        function sanitizeFilePath(pathStr) {
+            if (!pathStr) return '';
+            let cleaned = pathStr.trim();
+            if ((cleaned.startsWith('"') && cleaned.endsWith('"')) || (cleaned.startsWith("'") && cleaned.endsWith("'"))) {
+                cleaned = cleaned.substring(1, cleaned.length - 1);
+            }
+            return cleaned;
+        }
+
+        function getFileExtension(pathStr) {
+            const clean = sanitizeFilePath(pathStr);
+            const parts = clean.split('.');
+            if (parts.length > 1) {
+                return parts.pop().substring(0, 4);
+            }
+            return '';
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function escapeJsString(str) {
+            if (!str) return '';
+            return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+        }
+
+        function filterVault() {
+            const searchInput = document.getElementById('globalSearch');
+            if (!searchInput) return;
+
+            const query = searchInput.value.toLowerCase().trim();
+            const sections = document.querySelectorAll('.glass-section-card');
+
+            sections.forEach(secEl => {
+                const secId = secEl.id.replace('section-card-', '');
+                const sec = vaultData.find(s => s.id === secId);
+                
+                if (!sec) return;
+
+                let hasMatch = false;
+                if (sec.title.toLowerCase().includes(query)) {
+                    hasMatch = true;
+                }
+
+                sec.sources.forEach(src => {
+                    const matchTitle = src.title.toLowerCase().includes(query);
+                    const matchContent = src.content && src.content.toLowerCase().includes(query);
+                    const matchPath = src.path && src.path.toLowerCase().includes(query);
+
+                    const srcCard = document.getElementById(`source-${src.id}`);
+                    if (srcCard) {
+                        if (!query || matchTitle || matchContent || matchPath) {
+                            srcCard.style.display = 'flex';
+                            hasMatch = true;
+                        } else {
+                            srcCard.style.display = 'none';
+                        }
+                    }
+                });
+
+                if (!query || hasMatch) {
+                    secEl.style.display = 'block';
+                } else {
+                    secEl.style.display = 'none';
+                }
+            });
+        }
+
+        function exportDataBackup() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(vaultData, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `iiser_vault_backup_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function triggerImportBackup() {
+            document.getElementById('importFileInput').click();
+        }
+
+        function importDataBackup(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (Array.isArray(imported)) {
+                        vaultData = imported;
+                        saveVaultData();
+                        renderVault();
+                    } else {
+                        showToast('Invalid JSON structure. Expected an array of sections.');
+                    }
+                } catch (err) {
+                    showToast('Error parsing JSON backup file.');
+                }
+            };
+            reader.readAsText(file);
+        }
+    </script>
+</body>
+</html>
