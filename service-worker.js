@@ -2,13 +2,14 @@ const CACHE_NAME = 'site-cache-v1';
 
 // List of resources to pre-cache for offline access
 const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/alg.html',
-  '/books.html',
-  '/graph.html',
-  '/topo.html'
+  './',
+  './index.html',
+  './manifest.json',
+  './alg.html',
+  './books.html',
+  './graph.html',
+  './topo.html',
+  './image.png'
 ];
 
 // 1. Install Event: Cache static assets
